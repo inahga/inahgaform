@@ -1,6 +1,16 @@
 #
 #
 
+terraform {
+    backend "s3" {
+        bucket = "inahga-tf-state"
+        key = "terraform.tfstate"
+        region = "us-west-2"
+        dynamodb_table = "inahga_tf_state_locks"
+        encrypt = true
+    }
+}
+
 provider "vsphere" {
     user = var.vsphere_user
     password = var.vsphere_password
@@ -11,4 +21,8 @@ provider "vsphere" {
 provider "aws" {
     region = var.aws_region
     # Use awscli to set the AWS credentials for your session.
+}
+
+module "vsphere" {
+    source = "./vsphere"
 }
