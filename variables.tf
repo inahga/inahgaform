@@ -6,6 +6,3 @@ variable vsphere_server {
     default = "vcsa0.vsphere.inahga.org"
 }
 
-variable vsphere_datacenter {
-    default = "Datacenter"
-}
