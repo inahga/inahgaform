@@ -12,7 +12,8 @@ variable vsphere_packer_template_folder {
 variable vsphere_packer_templates {
     type = map
     default = {
-        centos_latest = "Packer_CentOS_Latest"
+        centos_8_latest = "Packer_CentOS_8_Latest"
+        centos_7_latest = "Packer_CentOS_7_Latest"
     }
 }
 
@@ -31,5 +32,14 @@ variable vsphere_hosts {
         "esxi2.vsphere.inahga.org",
         "esxi4.vsphere.inahga.org",
         "esxi5.vsphere.inahga.org"
+    ]
+}
+
+variable vsphere_datastores {
+    type = set(string)
+    default = [
+        "esxi2-Local",
+        "esxi4-Local",
+        "esxi5-Local"
     ]
 }
