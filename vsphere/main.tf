@@ -53,7 +53,7 @@ resource "vsphere_virtual_machine" "CENTOS8TST" {
     guest_id = "centos8_64Guest"
 
     network_interface {
-        network_id = vsphere_distributed_port_group.port_groups["DPG-TF-10-Public"].id
+        network_id = vsphere_distributed_port_group.port_groups["DPG-TF-20-Intranet"].id
     }
 
     disk {
