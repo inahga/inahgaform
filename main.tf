@@ -1,6 +1,3 @@
-#
-#
-
 terraform {
     backend "s3" {
         bucket = "inahga-tf-state"
@@ -25,4 +22,10 @@ provider "aws" {
 
 module "vsphere" {
     source = "./vsphere"
+    ssh_keys = var.ssh_keys
+}
+
+module "aws" {
+    source = "./aws"
+    ssh_keys = var.ssh_keys
 }

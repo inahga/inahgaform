@@ -43,3 +43,5 @@ variable vsphere_datastores {
         "esxi5-Local"
     ]
 }
+
+variable ssh_keys {}
