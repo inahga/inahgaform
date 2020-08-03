@@ -23,9 +23,11 @@ provider "aws" {
 module "vsphere" {
     source = "./vsphere"
     ssh_keys = var.ssh_keys
+    inventory_dir = "${path.module}/inventory/vsphere"
 }
 
 module "aws" {
     source = "./aws"
     ssh_keys = var.ssh_keys
+    inventory_dir = "${path.module}/inventory/aws"
 }

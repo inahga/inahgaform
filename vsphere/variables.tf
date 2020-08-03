@@ -1,6 +1,3 @@
-#
-#
-
 variable vsphere_datacenter {
     default = "Datacenter"
 }
@@ -45,3 +42,4 @@ variable vsphere_datastores {
 }
 
 variable ssh_keys {}
+variable inventory_dir {}
