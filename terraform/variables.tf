@@ -21,21 +21,21 @@ variable aws_vpc_subnets {
   ]
 }
 
-variable internet_ingress_allowlist {
-    default = {
-        10 = {
-            port = 22
-            protocol = "tcp"
-        }
-        20 = {
-            port = 80
-            protocol = "tcp"
-        }
-        30 = {
-            port = 443
-            protocol = "tcp"
-        }
+variable ingress_service_allowlist {
+  default = {
+    10 = {
+      port     = 22
+      protocol = "tcp"
     }
+    20 = {
+      port     = 80
+      protocol = "tcp"
+    }
+    30 = {
+      port     = 443
+      protocol = "tcp"
+    }
+  }
 }
 
 variable node_count {

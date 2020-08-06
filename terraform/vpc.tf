@@ -46,29 +46,16 @@ resource "aws_main_route_table_association" "cpxy_default_route_table_associatio
 resource "aws_default_network_acl" "cpxy_default_nacl" {
   default_network_acl_id = aws_vpc.cpxy_vpc.default_network_acl_id
 
-  ingress {
-    protocol   = "tcp"
-    rule_no    = 10
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 22
-    to_port    = 22
-  }
-  ingress {
-    protocol   = "tcp"
-    rule_no    = 20
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 80
-    to_port    = 80
-  }
-  ingress {
-    protocol   = "tcp"
-    rule_no    = 30
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 443
-    to_port    = 443
+  dynamic "ingress" {
+    for_each = var.ingress_service_allowlist
+    content {
+      protocol   = ingress.value["protocol"]
+      rule_no    = ingress.key
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+      from_port  = ingress.value["port"]
+      to_port    = ingress.value["port"]
+    }
   }
 
   egress {
@@ -83,28 +70,24 @@ resource "aws_default_network_acl" "cpxy_default_nacl" {
   tags = {
     Name = "cpxy_default_nacl"
   }
+
+  # See https://github.com/terraform-providers/terraform-provider-aws/issues/346
+  lifecycle {
+    ignore_changes = [subnet_ids]
+  }
 }
 
 resource "aws_default_security_group" "cpxy_default_sg" {
   vpc_id = aws_vpc.cpxy_vpc.id
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.ingress_service_allowlist
+    content {
+      from_port   = ingress.value["port"]
+      to_port     = ingress.value["port"]
+      protocol    = ingress.value["protocol"]
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   egress {
