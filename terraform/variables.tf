@@ -41,3 +41,7 @@ variable ingress_service_allowlist {
 variable node_count {
   default = 2
 }
+
+variable inventory_file {
+  default = "../inventory"
+}

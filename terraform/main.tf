@@ -22,7 +22,7 @@ data "aws_ami" "fedora" {
   }
 }
 
-resource "aws_instance" "lb_nodes" {
+resource "aws_instance" "cpxy_nodes" {
   count         = var.node_count
   ami           = data.aws_ami.fedora.id
   instance_type = var.aws_instance_type
@@ -30,6 +30,6 @@ resource "aws_instance" "lb_nodes" {
   subnet_id     = aws_subnet.cpxy_subnets[count.index % length(aws_subnet.cpxy_subnets)].id
 
   tags = {
-    Name = "cpxy_ec2_${count.index}"
+    Name = "cpxy_node_${count.index}"
   }
 }
