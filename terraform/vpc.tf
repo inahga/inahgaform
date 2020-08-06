@@ -1,58 +1,50 @@
 # Creates a VPC and divides it into two subnets
 
-resource "aws_vpc" "cloud_proxy" {
-  cidr_block           = "10.10.0.0/27"
+resource "aws_vpc" "cpxy_vpc" {
+  cidr_block           = var.aws_vpc_cidr_block
   instance_tenancy     = "default"
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Name = "cloud_proxy"
+    Name = "cpxy_vpc"
   }
 }
 
-resource "aws_subnet" "cloud_proxy_0" {
-  vpc_id     = aws_vpc.cloud_proxy.id
-  cidr_block = "10.10.0.0/28"
-  tags = {
-    Name = "cloud_proxy_0"
-  }
+resource "aws_subnet" "cpxy_subnets" {
+  count                   = length(var.aws_vpc_subnets)
+  vpc_id                  = aws_vpc.cpxy_vpc.id
+  cidr_block              = var.aws_vpc_subnets[count.index]
   map_public_ip_on_launch = true
-}
-
-resource "aws_subnet" "cloud_proxy_1" {
-  vpc_id     = aws_vpc.cloud_proxy.id
-  cidr_block = "10.10.0.16/28"
   tags = {
-    Name = "cloud_proxy_1"
-  }
-  map_public_ip_on_launch = true
-}
-
-resource "aws_internet_gateway" "cloud_proxy_gateway" {
-  vpc_id = aws_vpc.cloud_proxy.id
-  tags = {
-    Name = "cloud_proxy_gateway"
+    Name = "cpxy_subnet_${count.index}"
   }
 }
 
-resource "aws_route_table" "cloud_proxy_default" {
-  vpc_id = aws_vpc.cloud_proxy.id
+resource "aws_internet_gateway" "cpxy_gateway" {
+  vpc_id = aws_vpc.cpxy_vpc.id
+  tags = {
+    Name = "cpxy_gateway"
+  }
+}
+
+resource "aws_route_table" "cpxy_default_route_table" {
+  vpc_id = aws_vpc.cpxy_vpc.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.cloud_proxy_gateway.id
+    gateway_id = aws_internet_gateway.cpxy_gateway.id
   }
   tags = {
-    Name = "cloud_proxy_default"
+    Name = "cpxy_default_route_table"
   }
 }
 
-resource "aws_main_route_table_association" "cloud_proxy_association" {
-  vpc_id         = aws_vpc.cloud_proxy.id
-  route_table_id = aws_route_table.cloud_proxy_default.id
+resource "aws_main_route_table_association" "cpxy_default_route_table_association" {
+  vpc_id         = aws_vpc.cpxy_vpc.id
+  route_table_id = aws_route_table.cpxy_default_route_table.id
 }
 
-resource "aws_default_network_acl" "cloud_proxy_default_nacl" {
-  default_network_acl_id = aws_vpc.cloud_proxy.default_network_acl_id
+resource "aws_default_network_acl" "cpxy_default_nacl" {
+  default_network_acl_id = aws_vpc.cpxy_vpc.default_network_acl_id
 
   ingress {
     protocol   = "tcp"
@@ -89,12 +81,12 @@ resource "aws_default_network_acl" "cloud_proxy_default_nacl" {
   }
 
   tags = {
-    Name = "cloud_proxy_default_nacl"
+    Name = "cpxy_default_nacl"
   }
 }
 
-resource "aws_default_security_group" "cloud_proxy_default_sg" {
-  vpc_id = aws_vpc.cloud_proxy.id
+resource "aws_default_security_group" "cpxy_default_sg" {
+  vpc_id = aws_vpc.cpxy_vpc.id
 
   ingress {
     from_port   = 22
@@ -123,6 +115,6 @@ resource "aws_default_security_group" "cloud_proxy_default_sg" {
   }
 
   tags = {
-    Name = "cloud_proxy_default_sg"
+    Name = "cpxy_default_sg"
   }
 }
