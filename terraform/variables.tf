@@ -21,6 +21,10 @@ variable aws_vpc_subnets {
   ]
 }
 
+variable aws_hosted_zone_name {
+  default = "inahga.org."
+}
+
 variable ingress_service_allowlist {
   default = {
     10 = {
@@ -43,5 +47,5 @@ variable node_count {
 }
 
 variable inventory_file {
-  default = "../inventory"
+  default = "../inventory/cloud_proxy"
 }

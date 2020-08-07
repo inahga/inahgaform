@@ -33,3 +33,22 @@ resource "aws_instance" "cpxy_nodes" {
     Name = "cpxy_node_${count.index}"
   }
 }
+
+data "aws_route53_zone" "zone" {
+    name = var.aws_hosted_zone_name
+}
+
+resource "aws_route53_record" "dns_records" {
+    count = length(aws_instance.cpxy_nodes)
+    zone_id = data.aws_route53_zone.zone.zone_id
+    name = "proxy.aws"
+    type = "A"
+    ttl = "300"
+
+    weighted_routing_policy {
+      weight = 100
+    }
+
+    set_identifier = aws_instance.cpxy_nodes[count.index].tags["Name"]
+    records = [aws_instance.cpxy_nodes[count.index].public_ip]
+}
