@@ -1,0 +1,3 @@
+[cloud_proxy]
+ec2-54-148-95-235.us-west-2.compute.amazonaws.com ansible_host=54.148.95.235 ansible_user=fedora
+ec2-54-202-231-233.us-west-2.compute.amazonaws.com ansible_host=54.202.231.233 ansible_user=fedora
