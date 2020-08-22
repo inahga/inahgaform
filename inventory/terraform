@@ -1,0 +1,5 @@
+[aws_proxy_nodes]
+ec2-34-218-245-100.us-west-2.compute.amazonaws.com ansible_host=34.218.245.100 ansible_user=fedora
+
+[vsphere_proxy_nodes]
+10.0.30.12 ansible_user=fedora
