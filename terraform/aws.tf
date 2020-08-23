@@ -1,5 +1,3 @@
-# Creates a VPC and divides it into two subnets
-
 resource "aws_vpc" "cpxy_vpc" {
   cidr_block           = var.aws_vpc_cidr_block
   instance_tenancy     = "default"
