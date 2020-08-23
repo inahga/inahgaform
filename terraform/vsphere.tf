@@ -58,4 +58,8 @@ resource "vsphere_virtual_machine" "vsphere_nodes" {
       network_interface {}
     }
   }
+
+  lifecycle {
+    ignore_changes = [annotation]
+  }
 }

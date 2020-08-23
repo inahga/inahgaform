@@ -39,7 +39,15 @@ variable aws_ingress_service_allowlist {
       port     = 443
       protocol = "tcp"
     }
+    40 = {
+      port     = 2222
+      protocol = "tcp"
+    }
   }
+}
+
+variable aws_ssh_port {
+  default = 2222
 }
 
 variable aws_node_count {

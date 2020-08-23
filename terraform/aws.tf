@@ -46,16 +46,13 @@ resource "aws_main_route_table_association" "cpxy_default_route_table_associatio
 resource "aws_default_network_acl" "cpxy_default_nacl" {
   default_network_acl_id = aws_vpc.cpxy_vpc.default_network_acl_id
 
-  dynamic "ingress" {
-    for_each = var.aws_ingress_service_allowlist
-    content {
-      protocol   = ingress.value["protocol"]
-      rule_no    = ingress.key
-      action     = "allow"
-      cidr_block = "0.0.0.0/0"
-      from_port  = ingress.value["port"]
-      to_port    = ingress.value["port"]
-    }
+  ingress {
+    protocol   = -1
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
   }
 
   egress {
@@ -112,12 +109,32 @@ data "aws_ami" "fedora" {
   }
 }
 
+data "aws_ami" "centos" {
+  owners = ["125523088429"]
+  filter {
+    name = "image-id"
+
+    # CentOS 8.2
+    values = ["ami-0157b1e4eefd91fd7"]
+  }
+}
+
 resource "aws_instance" "cpxy_nodes" {
   count         = var.aws_node_count
-  ami           = data.aws_ami.fedora.id
+  ami           = data.aws_ami.centos.id
   instance_type = var.aws_instance_type
   key_name      = var.aws_ssh_key_name
   subnet_id     = aws_subnet.cpxy_subnets[count.index % length(aws_subnet.cpxy_subnets)].id
+
+  user_data = <<-EOT
+    #!/bin/bash
+    set -euo pipefail
+    PORT="${var.aws_ssh_port}"
+    echo "Port $PORT" | sudo tee -a /etc/ssh/sshd_config
+    sudo dnf install policycoreutils-python-utils
+    sudo semanage port -a -t ssh_port_t -p tcp "$PORT"
+    sudo systemctl restart sshd
+    EOT
 
   tags = {
     Name = "cpxy_node_${count.index}"
