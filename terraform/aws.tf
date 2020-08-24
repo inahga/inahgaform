@@ -118,11 +118,12 @@ data "aws_ami" "centos" {
 }
 
 resource "aws_instance" "cpxy_nodes" {
-  count         = var.aws_node_count
-  ami           = data.aws_ami.centos.id
-  instance_type = var.aws_instance_type
-  key_name      = var.aws_ssh_key_name
-  subnet_id     = aws_subnet.cpxy_subnets[count.index % length(aws_subnet.cpxy_subnets)].id
+  count                = var.aws_node_count
+  ami                  = data.aws_ami.centos.id
+  instance_type        = var.aws_instance_type
+  key_name             = var.aws_ssh_key_name
+  subnet_id            = aws_subnet.cpxy_subnets[count.index % length(aws_subnet.cpxy_subnets)].id
+  iam_instance_profile = aws_iam_instance_profile.cpxy_instance_profile.name
 
   user_data = <<-EOT
     #!/bin/bash
@@ -156,4 +157,66 @@ resource "aws_route53_record" "dns_records" {
 
   set_identifier = aws_instance.cpxy_nodes[count.index].tags["Name"]
   records        = [aws_instance.cpxy_nodes[count.index].public_ip]
+}
+
+resource "aws_iam_policy" "certbot" {
+  name = "certbot"
+  path = "/"
+
+  policy = <<EOT
+{
+  "Version": "2012-10-17",
+  "Id": "certbot-dns-route53",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:ListHostedZones",
+        "route53:GetChange"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Effect" : "Allow",
+      "Action" : [
+        "route53:ChangeResourceRecordSets"
+      ],
+      "Resource" : [
+        "arn:aws:route53:::hostedzone/${data.aws_route53_zone.zone.zone_id}"
+      ]
+    }
+  ]
+}
+EOT
+}
+
+resource "aws_iam_role" "certbot" {
+  name               = "certbot"
+  assume_role_policy = <<EOT
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOT
+}
+
+resource "aws_iam_role_policy_attachment" "certbot_attachment" {
+  role       = aws_iam_role.certbot.name
+  policy_arn = aws_iam_policy.certbot.arn
+}
+
+resource "aws_iam_instance_profile" "cpxy_instance_profile" {
+  name = "cpxy_instance_profile"
+  role = aws_iam_role.certbot.name
 }

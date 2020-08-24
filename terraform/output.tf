@@ -15,7 +15,7 @@ resource "local_file" "ansible_inventory" {
   content = <<EOT
 [aws_proxy_nodes]
 ${join("\n", formatlist(
-  "%s ansible_host=%s ansible_user=fedora ansible_port=${var.aws_ssh_port}",
+  "%s ansible_host=%s ansible_user=centos ansible_port=${var.aws_ssh_port}",
   aws_instance.cpxy_nodes.*.public_dns,
   aws_instance.cpxy_nodes.*.public_ip
   ))}

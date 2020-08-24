@@ -55,11 +55,12 @@ variable aws_node_count {
 }
 
 variable vsphere_node_count {
+  # Only 1 vSphere node is currently supported.
   default = 1
 }
 
 variable vsphere_node_cpu_count {
-  default = 1
+  default = 2
 }
 
 variable vsphere_node_memory_size {
