@@ -27,6 +27,7 @@ module "vsphere" {
 }
 
 module "aws" {
-  source   = "./aws"
-  ssh_keys = var.ssh_keys
+  source           = "./aws"
+  ssh_keys         = var.ssh_keys
+  local_ip_address = var.local_ip_address
 }

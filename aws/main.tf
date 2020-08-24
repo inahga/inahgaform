@@ -4,5 +4,6 @@ module "iam" {
 }
 
 module "route53" {
-  source = "./route53"
+  source           = "./route53"
+  local_ip_address = var.local_ip_address
 }
