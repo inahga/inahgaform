@@ -1,2 +1,2 @@
 [router]
-pfs0.public.inahga.org ansible_host=10.0.0.1
+pfs0.public.inahga.org ansible_host=10.0.0.1 ansible_user=aghani-sa

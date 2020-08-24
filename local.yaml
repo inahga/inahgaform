@@ -1,0 +1,6 @@
+---
+- name: Configure local proxy servers
+  hosts: vsphere_proxy_nodes
+  become: yes
+
+  tasks:

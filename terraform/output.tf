@@ -22,7 +22,7 @@ ${join("\n", formatlist(
 
 [vsphere_proxy_nodes]
 ${join("\n", formatlist(
-  "%s ansible_user=centos ansible_port=${var.aws_ssh_port}",
+  "%s ansible_user=centos",
   vsphere_virtual_machine.vsphere_nodes.*.default_ip_address,
 ))}
   EOT

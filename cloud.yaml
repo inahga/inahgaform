@@ -1,0 +1,33 @@
+---
+- name: Configure cloud proxy servers
+  hosts: aws_proxy_nodes
+  become: yes
+
+  vars:
+    - domain_name: inahga.org
+    - email_address: aghani@inahga.org
+
+  tasks:
+    - name: Install packages
+      package:
+        name:
+          - certbot
+          - python3-certbot-dns-route53
+
+    - name: Check if certbot is already configured
+      stat:
+        path: /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
+      register: letsencrypt_cert
+
+    - name: Configure certbot
+      command: "/usr/bin/certbot certonly --dns-route53 -d *.{{ domain_name }} -n --agree-tos -m {{ email_address }}"
+      when: not letsencrypt_cert.stat.exists
+
+    - name: Configure certbot renew cronjob
+      cron:
+        name: certbot renew
+        minute: "0"
+        hour: "0"
+        job: /usr/bin/certbot renew
+        cron_file: certbot
+        user: root
