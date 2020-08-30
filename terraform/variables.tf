@@ -102,3 +102,9 @@ variable vsphere_datastore {
 variable vsphere_server {
   default = "vcsa0.vsphere.inahga.org"
 }
+
+variable cnames {
+  default = [
+    "gitlab.inahga.org"
+  ]
+}

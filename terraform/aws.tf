@@ -159,6 +159,15 @@ resource "aws_route53_record" "dns_records" {
   records        = [aws_instance.cpxy_nodes[count.index].public_ip]
 }
 
+resource "aws_route53_record" "cnames" {
+  count   = length(var.cnames)
+  zone_id = data.aws_route53_zone.zone.zone_id
+  name    = var.cnames[count.index]
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["proxy.aws.inahga.org"]
+}
+
 resource "aws_iam_policy" "certbot" {
   name = "certbot"
   path = "/"
