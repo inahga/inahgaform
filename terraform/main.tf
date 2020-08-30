@@ -139,6 +139,10 @@ resource "aws_instance" "cpxy_nodes" {
   subnet_id            = aws_subnet.cpxy_subnets[count.index % length(aws_subnet.cpxy_subnets)].id
   iam_instance_profile = aws_iam_instance_profile.cpxy_instance_profile.name
 
+  credit_specification {
+    cpu_credits = "standard"
+  }
+
   user_data = <<-EOT
     #!/bin/bash
     set -euo pipefail

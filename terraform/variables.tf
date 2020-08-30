@@ -3,7 +3,7 @@ variable aws_ssh_key_name {
 }
 
 variable aws_instance_type {
-  default = "t2.micro"
+  default = "t3a.nano"
 }
 
 variable aws_region {
