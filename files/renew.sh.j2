@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+
+DOM="{{ domain_name }}"
+LEDIR="/etc/letsencrypt/live/$DOM"
+
+certbot renew
+cat "$LEDIR/fullchain.pem" "$LEDIR/privkey.pem" > "$LEDIR/$DOM.pem"
+systemctl reload haproxy

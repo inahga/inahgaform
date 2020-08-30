@@ -2,13 +2,31 @@
 - name: Configure cloud proxy servers
   hosts: aws_proxy_nodes
   become: yes
-
-  vars:
-    - domain_name: inahga.org
-    - email_address: aghani@inahga.org
+  vars_files: 
+    - variables.yaml
 
   tasks:
     - name: Install packages
+      package:
+        name:
+          - epel-release
+          - python3-libselinux
+          - python3-libsemanage
+          - haproxy
+
+    - name: Enable HAProxy
+      service:
+        name: haproxy
+        enabled: yes
+        state: started
+
+    - name: Configure SELinux for HAProxy
+      seboolean:
+        name: haproxy_connect_any
+        state: yes
+        persistent: yes
+
+    - name: Install certbot 
       package:
         name:
           - certbot
@@ -23,11 +41,29 @@
       command: "/usr/bin/certbot certonly --dns-route53 -d *.{{ domain_name }} -n --agree-tos -m {{ email_address }}"
       when: not letsencrypt_cert.stat.exists
 
+    - name: Install renewal script
+      template:
+        src: files/renew.sh.j2
+        dest: /usr/local/bin/renew.sh
+        mode: 0755
+
     - name: Configure certbot renew cronjob
       cron:
         name: certbot renew
         minute: "0"
         hour: "0"
-        job: /usr/bin/certbot renew
+        job: /usr/local/bin/renew.sh
         cron_file: certbot
         user: root
+
+    - name: Configure HAProxy
+      template:
+        src: files/haproxy_cloud.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      register: haproxy
+    
+    - name: Reload HAProxy
+      service:
+        name: haproxy
+        state: reloaded
+      when: haproxy.changed

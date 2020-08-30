@@ -2,39 +2,32 @@
 - name: Configure pfsense
   hosts: router
   become: yes
-
-  vars:
-    - port_forwards:
-        - name: ssh
-          port: 2222
-        - name: http
-          port: 80
-        - name: https
-          port: 443
+  vars_files:
+    - variables.yaml
 
   tasks:
-    - name: Configure aliases
-      pfsensible.core.aggregate:
-        aggregated_aliases:
-          - name: cloud_proxies
-            address: "{% for host in groups['aws_proxy_nodes'] %}{{ host }} {% endfor %}"
-            type: host
-            state: present
+    - name: Configure backend aliases
+      pfsensible.core.alias:
+        name: "{{ item.name }}"
+        address: "{{ item.address }}"
+        type: host
+        state: present
+      with_items: "{{ pfs_backend_aliases }}"
 
-          # For now, only one local proxy is supported.
-          # This module doesn't support configuring load balancing.
-          - name: local_proxies
-            address: "{% for host in groups['vsphere_proxy_nodes'] %}{{ host }} {% endfor %}"
-            type: host
-            state: present
-
+    - name: Configure proxy aliases
+      pfsensible.core.alias:
+        name: cloud_proxies
+        address: "{% for host in groups['aws_proxy_nodes'] %}{{ host }} {% endfor %}"
+        type: host
+        state: present
+          
     - name: Forward ports
       pfsensible.core.nat_port_forward:
         descr: "cloud_proxy_{{ item.name }}"
         interface: wan 
         source: cloud_proxies
         destination: "IP:wan:{{ item.port }}"
-        target: "local_proxies:{{ item.port }}"
-        protocol: tcp
+        target: "{{ item.backend_alias }}:{{ item.backend_port }}"
+        protocol: "{{ item.protocol }}"
         state: present
-      with_items: "{{ port_forwards }}"
+      with_items: "{{ pfs_simple_port_forwards }}"

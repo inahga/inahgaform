@@ -1,0 +1,50 @@
+global
+    log /dev/log local0
+    chroot /var/lib/haproxy
+    pidfile /var/run/haproxy.pid
+    stats socket /var/lib/haproxy/stats
+    maxconn 10000
+
+    user haproxy
+    group haproxy
+
+    ssl-default-bind-ciphers PROFILE=SYSTEM
+    ssl-default-server-ciphers PROFILE=SYSTEM
+
+defaults
+    mode tcp 
+    log global
+    option tcplog 
+    option dontlognull
+    option redispatch
+    retries 3
+    timeout queue 1m
+    timeout connect 10s
+    timeout client 1m
+    timeout server 1m
+    timeout check 10s
+    maxconn 3000
+
+listen gitlab_ssh
+    mode tcp
+    option tcplog
+    bind *:22
+    server gitlab_ssh dmz.{{ domain_name }}:2222
+
+frontend http
+    mode http
+    option httplog
+    option http-server-close
+    option forwardfor except 127.0.0.0/8
+    timeout http-keep-alive 10s
+    timeout http-request 10s
+
+    bind *:80
+    bind *:443 ssl crt /etc/letsencrypt/live/{{ domain_name }}/{{ domain_name }}.pem
+
+    redirect scheme https code 301 if !{ ssl_fc }
+    use_backend gitlab if { hdr(host) -i gitlab.inahga.org }
+
+backend gitlab
+    mode http
+    server gitlab dmz.{{ domain_name }}:8443 ssl verify none

@@ -1,0 +1,2 @@
+[aws_proxy_nodes]
+ec2-54-218-177-213.us-west-2.compute.amazonaws.com ansible_host=54.218.177.213 ansible_user=centos ansible_port=2222
