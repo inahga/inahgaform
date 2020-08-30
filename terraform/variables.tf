@@ -54,53 +54,8 @@ variable aws_node_count {
   default = 1
 }
 
-variable vsphere_node_count {
-  # Only 1 vSphere node is currently supported.
-  default = 1
-}
-
-variable vsphere_node_cpu_count {
-  default = 2
-}
-
-variable vsphere_node_memory_size {
-  default = 1024
-}
-
 variable inventory_file {
   default = "../inventory/terraform"
-}
-
-variable vsphere_user {}
-
-variable vsphere_password {}
-
-variable vsphere_datacenter {
-  default = "Datacenter"
-}
-
-variable vsphere_template_folder {
-  default = "PackerTemplates"
-}
-
-variable vsphere_template {
-  default = "Packer_CentOS_8_Latest"
-}
-
-variable vsphere_dport_group {
-  default = "DPG-TF-30-DMZ"
-}
-
-variable vsphere_host {
-  default = "esxi2.vsphere.inahga.org"
-}
-
-variable vsphere_datastore {
-  default = "esxi2-Local"
-}
-
-variable vsphere_server {
-  default = "vcsa0.vsphere.inahga.org"
 }
 
 variable cnames {
