@@ -46,6 +46,7 @@
         src: files/renew.sh.j2
         dest: /usr/local/bin/renew.sh
         mode: 0755
+      register: renew
 
     - name: Configure certbot renew cronjob
       cron:
@@ -56,6 +57,10 @@
         cron_file: certbot
         user: root
 
+    - name: Run renew script
+      command: "/usr/local/bin/renew.sh"
+      when: renew.changed 
+
     - name: Install IP blocklist script
       copy:
         src: files/blocklist.sh
@@ -64,7 +69,7 @@
 
     - name: Check if IP blocklist exists
       stat:
-        path: /etc/haproxy/auto_blocklist.cfg
+        path: /etc/haproxy/auto_blocklist.txt
       register: blocklist
     
     - name: Run IP blocklist script
@@ -79,6 +84,24 @@
         job: /usr/local/bin/blocklist.sh
         cron_file: blocklist
         user: root
+    
+    - name: Create HAProxy logging socket folder
+      file:
+        path: /var/lib/haproxy/dev
+        state: directory
+
+    - name: Touch HAProxy logging socket
+      file:
+        path: /var/lib/haproxy/dev/log
+        state: touch
+
+    - name: Mount HAProxy logging socket
+      mount:
+        path: /var/lib/haproxy/dev/log
+        src: /dev/log
+        opts: bind
+        state: mounted
+        fstype: none
     
     - name: Configure HAProxy
       template:
