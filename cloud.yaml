@@ -56,6 +56,30 @@
         cron_file: certbot
         user: root
 
+    - name: Install IP blocklist script
+      copy:
+        src: files/blocklist.sh
+        dest: /usr/local/bin/blocklist.sh
+        mode: 0755
+
+    - name: Check if IP blocklist exists
+      stat:
+        path: /etc/haproxy/auto_blocklist.cfg
+      register: blocklist
+    
+    - name: Run IP blocklist script
+      command: "/usr/local/bin/blocklist.sh"
+      when: not blocklist.stat.exists
+
+    - name: Configure blocklist cronjob
+      cron:
+        name: blocklist regenerate
+        minute: "0"
+        hour: "0"
+        job: /usr/local/bin/blocklist.sh
+        cron_file: blocklist
+        user: root
+    
     - name: Configure HAProxy
       template:
         src: files/haproxy_cloud.cfg.j2
