@@ -5,6 +5,8 @@
 - pfs_backend_aliases:
   - name: gitlab 
     address: gitlab.dmz.inahga.org
+  - name: minecraft
+    address: minecraft.dmz.inahga.org
 
 # Either TCP or UDP port forwards
 - pfs_simple_port_forwards:
@@ -19,3 +21,15 @@
     backend_alias: gitlab
     backend_port: 443
     protocol: tcp
+  
+  - name: minecraft_ssh
+    port: 6901
+    backend_alias: minecraft
+    backend_port: 22
+    protocol: tcp
+
+  - name: minecraft
+    port: 6900
+    backend_alias: minecraft
+    backend_port: 6900
+    protocol: tcp/udp

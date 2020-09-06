@@ -32,7 +32,6 @@ ansible-playbook -i inventory pfsense.yaml &
     - Deploy with Terraform and configure with Ansible.
 
 ## Todo
-- Place game servers behind proxy
 - Configure rsyslog to point to a nicer interface
 - Monitor, test, and tweak abuse protection
 - Find secure way to access HAProxy stats

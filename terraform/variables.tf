@@ -43,6 +43,14 @@ variable aws_ingress_service_allowlist {
       port     = 2222
       protocol = "tcp"
     }
+    50 = {
+      port     = 6900
+      protocol = "tcp"
+    }
+    51 = {
+      port     = 6901
+      protocol = "tcp"
+    }
   }
 }
 
@@ -60,6 +68,7 @@ variable inventory_file {
 
 variable cnames {
   default = [
-    "gitlab.inahga.org"
+    "gitlab.inahga.org",
+    "minecraft.inahga.org"
   ]
 }
