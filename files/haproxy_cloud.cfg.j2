@@ -33,8 +33,8 @@ listen gitlab_ssh
     timeout client 10m
 
     tcp-request connection track-sc1 src table ssh_abuse
-    tcp-request connection reject if { src_conn_rate(abuse) ge 5 }
-    tcp-request connection reject if { src_conn_cur(abuse) ge 2 }
+    tcp-request connection reject if { src_conn_rate(ssh_abuse) ge 5 }
+    tcp-request connection reject if { src_conn_cur(ssh_abuse) ge 2 }
 
     acl is-auto-blocklisted src -m ip -f /etc/haproxy/auto_blocklist.txt
     tcp-request connection reject if is-auto-blocklisted
@@ -63,8 +63,8 @@ listen minecraft_ssh
     timeout client 30m
 
     tcp-request connection track-sc1 src table ssh_abuse
-    tcp-request connection reject if { src_conn_rate(abuse) ge 5 }
-    tcp-request connection reject if { src_conn_cur(abuse) ge 2 }
+    tcp-request connection reject if { src_conn_rate(ssh_abuse) ge 5 }
+    tcp-request connection reject if { src_conn_cur(ssh_abuse) ge 2 }
 
     acl is-auto-blocklisted src -m ip -f /etc/haproxy/auto_blocklist.txt
     tcp-request connection reject if is-auto-blocklisted
