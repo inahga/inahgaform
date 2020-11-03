@@ -1,0 +1,7 @@
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+secrets.auto.tfvars
+ansible_collections
+roles
+

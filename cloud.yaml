@@ -1,0 +1,116 @@
+---
+- name: Configure cloud proxy servers
+  hosts: aws_proxy_nodes
+  become: yes
+  vars_files: 
+    - variables.yaml
+
+  tasks:
+    - name: Install packages
+      package:
+        name:
+          - epel-release
+          - python3-libselinux
+          - python3-libsemanage
+          - haproxy
+
+    - name: Enable HAProxy
+      service:
+        name: haproxy
+        enabled: yes
+        state: started
+
+    - name: Configure SELinux for HAProxy
+      seboolean:
+        name: haproxy_connect_any
+        state: yes
+        persistent: yes
+
+    - name: Install certbot 
+      package:
+        name:
+          - certbot
+          - python3-certbot-dns-route53
+
+    - name: Check if certbot is already configured
+      stat:
+        path: /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
+      register: letsencrypt_cert
+
+    - name: Configure certbot
+      command: "/usr/bin/certbot certonly --dns-route53 -d *.{{ domain_name }} -n --agree-tos -m {{ email_address }}"
+      when: not letsencrypt_cert.stat.exists
+
+    - name: Install renewal script
+      template:
+        src: files/renew.sh.j2
+        dest: /usr/local/bin/renew.sh
+        mode: 0755
+      register: renew
+
+    - name: Configure certbot renew cronjob
+      cron:
+        name: certbot renew
+        minute: "0"
+        hour: "0"
+        job: /usr/local/bin/renew.sh
+        cron_file: certbot
+        user: root
+
+    - name: Run renew script
+      command: "/usr/local/bin/renew.sh"
+      when: renew.changed 
+
+    - name: Install IP blocklist script
+      copy:
+        src: files/blocklist.sh
+        dest: /usr/local/bin/blocklist.sh
+        mode: 0755
+
+    - name: Check if IP blocklist exists
+      stat:
+        path: /etc/haproxy/auto_blocklist.txt
+      register: blocklist
+    
+    - name: Run IP blocklist script
+      command: "/usr/local/bin/blocklist.sh"
+      when: not blocklist.stat.exists
+
+    - name: Configure blocklist cronjob
+      cron:
+        name: blocklist regenerate
+        minute: "0"
+        hour: "0"
+        job: /usr/local/bin/blocklist.sh
+        cron_file: blocklist
+        user: root
+    
+    - name: Create HAProxy logging socket folder
+      file:
+        path: /var/lib/haproxy/dev
+        state: directory
+
+    - name: Touch HAProxy logging socket
+      file:
+        path: /var/lib/haproxy/dev/log
+        state: touch
+
+    - name: Mount HAProxy logging socket
+      mount:
+        path: /var/lib/haproxy/dev/log
+        src: /dev/log
+        opts: bind
+        state: mounted
+        fstype: none
+    
+    - name: Configure HAProxy
+      template:
+        src: files/haproxy_cloud.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      register: haproxy
+    
+    - name: Reload HAProxy
+      service:
+        name: haproxy
+        state: reloaded
+      when: haproxy.changed

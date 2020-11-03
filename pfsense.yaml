@@ -1,0 +1,33 @@
+---
+- name: Configure pfsense
+  hosts: router
+  become: yes
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Configure backend aliases
+      pfsensible.core.alias:
+        name: "{{ item.name }}"
+        address: "{{ item.address }}"
+        type: host
+        state: present
+      with_items: "{{ pfs_backend_aliases }}"
+
+    - name: Configure proxy aliases
+      pfsensible.core.alias:
+        name: cloud_proxies
+        address: "{% for host in groups['aws_proxy_nodes'] %}{{ host }} {% endfor %}"
+        type: host
+        state: present
+          
+    - name: Forward ports
+      pfsensible.core.nat_port_forward:
+        descr: "cloud_proxy_{{ item.name }}"
+        interface: wan 
+        source: cloud_proxies
+        destination: "IP:wan:{{ item.port }}"
+        target: "{{ item.backend_alias }}:{{ item.backend_port }}"
+        protocol: "{{ item.protocol }}"
+        state: present
+      with_items: "{{ pfs_simple_port_forwards }}"

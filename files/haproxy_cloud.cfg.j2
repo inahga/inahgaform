@@ -1,0 +1,106 @@
+global
+    log /dev/log local0
+    chroot /var/lib/haproxy
+    pidfile /var/run/haproxy.pid
+    stats socket /var/lib/haproxy/stats
+    maxconn 10000
+
+    user haproxy
+    group haproxy
+
+    ssl-default-bind-ciphers PROFILE=SYSTEM
+    ssl-default-server-ciphers PROFILE=SYSTEM
+
+defaults
+    mode tcp 
+    log global
+    option tcplog 
+    option dontlognull
+    option redispatch
+    retries 3
+    timeout queue 1m
+    timeout check 10s
+    timeout connect 5s
+    timeout server 30s
+    timeout client 60s
+    maxconn 3000
+
+listen gitlab_ssh
+    mode tcp
+    option tcplog
+
+    timeout server 10m
+    timeout client 10m
+
+    tcp-request connection track-sc1 src table ssh_abuse
+    tcp-request connection reject if { src_conn_rate(ssh_abuse) ge 5 }
+    tcp-request connection reject if { src_conn_cur(ssh_abuse) ge 2 }
+
+    acl is-auto-blocklisted src -m ip -f /etc/haproxy/auto_blocklist.txt
+    tcp-request connection reject if is-auto-blocklisted
+
+    bind *:22
+    server gitlab_ssh dmz.inahga.org:2222
+
+listen minecraft
+    mode tcp
+    option tcplog
+
+    timeout server 10m
+    timeout client 10m
+
+    acl is-auto-blocklisted src -m ip -f /etc/haproxy/auto_blocklist.txt
+    tcp-request connection reject if is-auto-blocklisted
+
+    bind *:6900
+    server minecraft dmz.inahga.org:6900
+
+listen minecraft_ssh
+    mode tcp
+    option tcplog
+
+    timeout server 30m
+    timeout client 30m
+
+    tcp-request connection track-sc1 src table ssh_abuse
+    tcp-request connection reject if { src_conn_rate(ssh_abuse) ge 5 }
+    tcp-request connection reject if { src_conn_cur(ssh_abuse) ge 2 }
+
+    acl is-auto-blocklisted src -m ip -f /etc/haproxy/auto_blocklist.txt
+    tcp-request connection reject if is-auto-blocklisted
+
+    bind *:6901
+    server minecraft_ssh dmz.inahga.org:6901
+
+frontend http
+    mode http
+    option httplog
+    option http-server-close
+    option forwardfor except 127.0.0.0/8
+    timeout http-keep-alive 10s
+    timeout http-request 10s
+
+    bind *:80
+    bind *:443 ssl crt /etc/letsencrypt/live/inahga.org/inahga.org.pem
+
+    tcp-request connection track-sc0 src table abuse
+    tcp-request connection reject if { src_conn_rate(abuse) ge 10 }
+    tcp-request connection reject if { src_conn_cur(abuse) ge 10 }
+    tcp-request connection reject if { src_http_err_rate(abuse) ge 20 }
+
+    acl is-auto-blocklisted src -m ip -f /etc/haproxy/auto_blocklist.txt
+    acl is-auto-blocklisted hdr_ip(X-Forwarded-For,1) -f /etc/haproxy/auto_blocklist.txt
+    http-request silent-drop if is-auto-blocklisted
+
+    redirect scheme https code 301 if !{ ssl_fc }
+    use_backend gitlab if { hdr(host) -i gitlab.inahga.org }
+
+backend gitlab
+    mode http
+    server gitlab dmz.inahga.org:8443 ssl verify none
+
+backend abuse
+    stick-table type ip size 1m expire 30m store gpc0,conn_rate(3s),conn_cur,http_req_rate(10s),http_err_rate(5m)
+
+backend ssh_abuse
+    stick-table type ip size 1m expire 30m store gpc0,conn_rate(1m),conn_cur
