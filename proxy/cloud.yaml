@@ -14,6 +14,15 @@
           - python3-libsemanage
           - haproxy
 
+    - name: Update weekly
+      cron:
+        name: dnf cron
+        job: "dnf update -y"
+        minute: "0"
+        hour: "0"
+        weekday: "5"
+        user: root
+
     - name: Enable HAProxy
       service:
         name: haproxy
