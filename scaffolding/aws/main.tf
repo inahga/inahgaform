@@ -24,6 +24,30 @@ resource "aws_s3_bucket" "inahga" {
   }
 }
 
+resource "aws_s3_bucket" "inahga-public" {
+  bucket = "inahga-public"
+  acl    = "public-read"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::inahga-public/*"
+            ]
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_s3_bucket_public_access_block" "inahga" {
   bucket                  = aws_s3_bucket.inahga.id
   block_public_acls       = true
