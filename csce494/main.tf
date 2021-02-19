@@ -61,6 +61,8 @@ set -eou pipefail
 apt-get update
 apt-get install git nodejs npm certbot python3-certbot-dns-route53 docker.io docker-compose -y
 
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDP+S4JXEjESV3Der0L8Tp3cpmRLeqqDLRDjBgDy0AFWszJKsRJi2BPEJZj/y7zionjFQZCmLUaHk+Z1CGyjyyfBzrFXJWQgLm3R/3KZzpWuxEGreuEDgPYWus3t1iALf6CSIliR309HVG1N5ec6qhkA7Vk9U8NwrG9GnW5unPoF2cMBIwjlvP053e5UvkOW0bN7Vtj+hPNUi0mpMpMj3zArHKjiZxX+QEsr8MpZ50cMlBt1rQ/pq9g1l5AaYEcBhX6JBmCx3WXk7VmN4Hv4beQofABBd8FqPQzzcSjt1Oo/I84NyFnuMJ5piRmQ/veWmFFou31rw5BmAA4fmPkz6CVLSWhI5lxWxH5XYJIOW77qLISNDIybbSMkWQFkHATxipFTF+EcYtAz3S2vDAOzyIrRzbXPJRjVuu+f0uR0h1bGcQHKxAiKQXSJptvyN8sTFNLVeiwaxRMp1mNBhng0YOPNimL9R1ECOYP74FYL9FJdN7nuGvizpfSFo6s49eUvWk= github-deploy-key" >> /home/ubuntu/.ssh/authorized_keys
+
 systemctl enable docker
 systemctl start docker
 
