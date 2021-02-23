@@ -79,22 +79,22 @@ EOF
 
 chmod +x /etc/cron.weekly/renew.sh
 
-tee /var/run/secrets.env >/dev/null <<EOF
-NODE_ENV=production
-PORT=443
-MYSQL_ROOT_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
-MYSQL_DATABASE=hafh
-MYSQL_USER=hafh
-MYSQL_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
-TLS_CERT=/etc/letsencrypt/live/csce494.inahga.org/fullchain.pem
-TLS_KEY=/etc/letsencrypt/live/csce494.inahga.org/privkey.pem
+mkdir -p /opt/secrets
+tee /opt/secrets/secrets.env >/dev/null <<EOF
+export NODE_ENV=production
+export PORT=443
+export MYSQL_ROOT_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
+export MYSQL_DATABASE=hafh
+export MYSQL_USER=hafh
+export MYSQL_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
+export TLS_CERT=/etc/letsencrypt/live/csce494.inahga.org/fullchain.pem
+export TLS_KEY=/etc/letsencrypt/live/csce494.inahga.org/privkey.pem
 EOF
 
-mkdir -p /opt
 cd /opt
 git clone https://github.com/inahga/hafh
 cd hafh/server
-docker-compose --env-file /var/run/secrets.env up -d
+docker-compose --env-file /opt/secrets/secrets.env up -d
 EOT
 
   tags = {
