@@ -81,15 +81,18 @@ chmod +x /etc/cron.weekly/renew.sh
 
 mkdir -p /opt/secrets
 tee /opt/secrets/secrets.env >/dev/null <<EOF
-export NODE_ENV=production
-export PORT=443
-export MYSQL_ROOT_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
-export MYSQL_DATABASE=hafh
-export MYSQL_USER=hafh
-export MYSQL_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
-export TLS_CERT=/etc/letsencrypt/live/csce494.inahga.org/fullchain.pem
-export TLS_KEY=/etc/letsencrypt/live/csce494.inahga.org/privkey.pem
+JWT_SECRET=$(head -c64 /dev/urandom | sha512sum | head -c64)
+NODE_ENV=production
+PORT=443
+MYSQL_ROOT_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
+MYSQL_DATABASE=hafh
+MYSQL_USER=hafh
+MYSQL_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
+TLS_CERT=/etc/letsencrypt/live/csce494.inahga.org/fullchain.pem
+TLS_KEY=/etc/letsencrypt/live/csce494.inahga.org/privkey.pem
 EOF
+chown root:root /opt/secrets/secrets.env
+chmod 0600 /opt/secrets/secrets.env
 
 cd /opt
 git clone https://github.com/inahga/hafh
