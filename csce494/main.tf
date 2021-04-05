@@ -79,6 +79,13 @@ EOF
 
 chmod +x /etc/cron.weekly/renew.sh
 
+tee /etc/cron.weekly/prune.sh <<EOF
+#!/bin/bash
+docker image prune
+EOF
+
+chmod +x /etc/cron.weekly/prune.sh
+
 mkdir -p /opt/secrets
 tee /opt/secrets/secrets.env >/dev/null <<EOF
 JWT_SECRET=$(head -c64 /dev/urandom | sha512sum | head -c64)
@@ -90,6 +97,7 @@ MYSQL_USER=hafh
 MYSQL_PASSWORD=$(head -c64 /dev/urandom | sha512sum | head -c64)
 TLS_CERT=/etc/letsencrypt/live/csce494.inahga.org/fullchain.pem
 TLS_KEY=/etc/letsencrypt/live/csce494.inahga.org/privkey.pem
+GCP_API_KEY=
 EOF
 chown root:root /opt/secrets/secrets.env
 chmod 0600 /opt/secrets/secrets.env
