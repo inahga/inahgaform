@@ -6,6 +6,13 @@ terraform {
     dynamodb_table = "inahga_tf_state_locks"
     encrypt        = true
   }
+
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 1.0"
+    }
+  }
 }
 
 # provider "vsphere" {
@@ -15,19 +22,28 @@ terraform {
 #   allow_unverified_ssl = true
 # }
 
-provider "aws" {
-  region = var.aws_region
-  # Use awscli to set the AWS credentials for your session.
-}
-
 # module "vsphere" {
 #   source        = "./vsphere"
 #   ssh_keys      = var.ssh_keys
 #   inventory_dir = "${path.module}/inventory/vsphere"
 # }
 
+provider "aws" {
+  region = var.aws_region
+  # Use awscli to set the AWS credentials for your session.
+}
+
 module "aws" {
   source           = "./aws"
   ssh_keys         = var.ssh_keys
   local_ip_address = var.local_ip_address
+}
+
+provider "digitalocean" {
+  token = var.digitalocean_apikey
+}
+
+module "digitalocean" {
+  source   = "./digitalocean"
+  ssh_keys = var.ssh_keys
 }
