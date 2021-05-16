@@ -1,5 +1,0 @@
-secrets.auto.tfvars
-secrets.auto.tfvars.json
-.terraform/
-terraform.tfstate
-terraform.tfstate.backup
