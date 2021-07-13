@@ -20,4 +20,3 @@ variable "ssh_keys" {
 variable "local_ip_address" {
   default = "67.184.129.197"
 }
-
