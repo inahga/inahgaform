@@ -1,0 +1,58 @@
+---
+- hosts: wireguard
+  become: true
+  tasks:
+    - name: Enable IPv4 forwarding
+      ansible.builtin.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        sysctl_set: yes
+        state: present
+        reload: yes
+
+    - name: Configure nftables
+      ansible.builtin.copy:
+        dest: /etc/nftables.conf
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          #!/usr/sbin/nft -f
+          flush ruleset
+
+          table ip nat {
+                  chain prerouting {
+                          type nat hook prerouting priority dstnat; policy accept;
+                          iif "eth0" tcp dport {{ service_port }} dnat to {{ local_vpn_ip }}
+                          iif "eth0" udp dport {{ service_port }} dnat to {{ local_vpn_ip }}
+                  }
+
+                  chain postrouting {
+                          type nat hook postrouting priority srcnat; policy accept;
+                          oifname "wg0" masquerade
+                  }
+          }
+
+          table ip filter {
+                  chain forward {
+                          type filter hook forward priority filter; policy drop;
+                          iifname "wg0" accept
+                          iif "eth0" tcp dport {{ service_port }} accept
+                          iif "eth0" udp dport {{ service_port }} accept
+                  }
+
+                  chain input {
+                          type filter hook input priority filter; policy drop;
+                          iifname "lo" accept
+                          ct state { established, related } accept
+                          ip protocol icmp accept
+                          tcp dport ssh accept
+                          udp dport {{ remote_vpn_port }} accept
+                  }
+          }
+
+    - name: Enable nftables
+      ansible.builtin.systemd:
+        state: restarted
+        enabled: true
+        name: nftables

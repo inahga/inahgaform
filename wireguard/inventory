@@ -1,0 +1,14 @@
+all:
+  hosts:
+    wireguard:
+      ansible_host: 157.230.185.42
+      ansible_user: root
+    alexandria:
+      ansible_host: 10.0.0.250
+      ansible_user: aghani
+  vars:
+    remote_pub_ip: 157.230.185.42
+    remote_vpn_ip: 10.0.10.2
+    remote_vpn_port: 21841
+    local_vpn_ip: 10.0.10.1
+    service_port: 6970

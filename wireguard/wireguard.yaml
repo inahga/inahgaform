@@ -1,0 +1,94 @@
+---
+- hosts: wireguard:alexandria
+  become: true
+
+  tasks:
+    - name: Install Debian backports
+      ansible.builtin.apt_repository:
+        repo: deb http://deb.debian.org/debian buster-backports main
+        state: present
+      when: ansible_distribution == 'Debian'
+
+    - name: Install Wireguard
+      ansible.builtin.package:
+        name: wireguard
+        state: present
+
+- hosts: wireguard:alexandria
+  tasks:
+    - name: Generate private key for remote server
+      local_action: ansible.builtin.shell wg genkey
+      run_once: true
+      register: rpriv
+
+    - name: Generate private key for local server
+      local_action: ansible.builtin.shell wg genkey
+      run_once: true
+      register: lpriv
+
+    - set_fact:
+        rpriv={{ rpriv.stdout }}
+        lpriv={{ lpriv.stdout }}
+
+    - name: Generate public key for remote server
+      local_action: ansible.builtin.shell echo {{ rpriv }} | wg pubkey
+      run_once: true
+      register: rpub
+
+    - name: Generate public key for local server
+      local_action: ansible.builtin.shell echo {{ lpriv }} | wg pubkey
+      run_once: true
+      register: lpub
+
+    - set_fact:
+        rpub={{ rpub.stdout }}
+        lpub={{ lpub.stdout }}
+
+- hosts: wireguard
+  become: true
+  tasks:
+    - name: Configure Wireguard
+      ansible.builtin.copy:
+        dest: /etc/wireguard/wg0.conf
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          [Interface]
+          Address = {{ remote_vpn_ip }}
+          PrivateKey = {{ rpriv }}
+          ListenPort = {{ remote_vpn_port }}
+
+          [Peer]
+          PublicKey = {{ lpub }}
+          AllowedIPs = {{ local_vpn_ip }}/32
+
+- hosts: alexandria
+  become: true
+  tasks:
+    - name: Configure Wireguard
+      ansible.builtin.copy:
+        dest: /etc/wireguard/wg0.conf
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          [Interface]
+          Address = {{ local_vpn_ip }}
+          PrivateKey = {{ lpriv }}
+
+          [Peer]
+          PublicKey = {{ rpub }}
+          AllowedIPs = {{ remote_vpn_ip }}/32
+          Endpoint = {{ remote_pub_ip }}:{{ remote_vpn_port }}
+          PersistentKeepalive = 25
+
+- hosts: wireguard:alexandria
+  become: true
+  tasks:
+    - name: Restart Wireguard
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: true
+        enabled: true
+        name: wg-quick@wg0.service
