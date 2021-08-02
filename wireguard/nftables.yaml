@@ -37,6 +37,7 @@
                   chain forward {
                           type filter hook forward priority filter; policy drop;
                           iifname "wg0" accept
+                          log
                           iif "eth0" tcp dport {{ service_port }} accept
                           iif "eth0" udp dport {{ service_port }} accept
                   }
