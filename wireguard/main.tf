@@ -78,13 +78,13 @@ all:
       ansible_host: ${digitalocean_droplet.wg.ipv4_address}
       ansible_user: root
     alexandria:
-      ansible_host: 10.0.0.250
-      ansible_user: aghani
+      ansible_host: 192.168.50.181
+      ansible_user: inahga
   vars:
     remote_pub_ip: ${digitalocean_droplet.wg.ipv4_address}
-    remote_vpn_ip: 10.0.10.2
+    remote_vpn_ip: 192.168.51.1
     remote_vpn_port: 21841
-    local_vpn_ip: 10.0.10.1
+    local_vpn_ip: 192.168.51.2
     service_port: 6970
 EOT
 }

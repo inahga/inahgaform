@@ -2,6 +2,11 @@
 - hosts: wireguard
   become: true
   tasks:
+    - name: Install nftables
+      ansible.builtin.package:
+        name: nftables
+        state: present
+
     - name: Enable IPv4 forwarding
       ansible.builtin.sysctl:
         name: net.ipv4.ip_forward
