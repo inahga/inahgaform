@@ -86,5 +86,6 @@ all:
     remote_vpn_port: 21841
     local_vpn_ip: 192.168.51.2
     service_port: 6970
+    vanilla_port: 25565
 EOT
 }

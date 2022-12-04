@@ -30,6 +30,8 @@
                           type nat hook prerouting priority dstnat; policy accept;
                           iif "eth0" tcp dport {{ service_port }} dnat to {{ local_vpn_ip }}
                           iif "eth0" udp dport {{ service_port }} dnat to {{ local_vpn_ip }}
+                          iif "eth0" tcp dport {{ vanilla_port }} dnat to {{ local_vpn_ip }}
+                          iif "eth0" udp dport {{ vanilla_port }} dnat to {{ local_vpn_ip }}
                   }
 
                   chain postrouting {
@@ -45,6 +47,8 @@
                           log
                           iif "eth0" tcp dport {{ service_port }} accept
                           iif "eth0" udp dport {{ service_port }} accept
+                          iif "eth0" tcp dport {{ vanilla_port }} accept
+                          iif "eth0" udp dport {{ vanilla_port }} accept
                   }
 
                   chain input {
