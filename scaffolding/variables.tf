@@ -1,10 +1,4 @@
-variable "vsphere_user" {}
-variable "vsphere_password" {}
 variable "digitalocean_apikey" {}
-
-variable "vsphere_server" {
-  default = "vcsa0.vsphere.inahga.org"
-}
 
 variable "aws_region" {
   default = "us-west-2"
@@ -13,10 +7,8 @@ variable "aws_region" {
 variable "ssh_keys" {
   type = map(string)
   default = {
-    aghani = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC8KsdwZhjOBKbNMtsRJFwYvWZ8SISJSV9xVzVsK8B7mNU+SVtaVP5/VJVUJoJq+D6yPUU2QYnwTfwJ5HZDibjYuU5ReSjb/sKWByRzl5Rt0nxXHrNUeycgaZwqyYmNysmuyyI0PE8Hb5yxYJO9elRnoFyV5tEJEptniHOubVCjawIh+aQg8kEPMH0erbgnR3r62sK3j6whpc4bjU9kS6aQeY5oRg52xDIkK7vFZJpVPPQmk3uZztYZ4UjejBbDcDK8lMl+m3Zr7rplSu2NthSZ2iTTDL6F8Zg9YEVo23H1ABI7p0xtHwXmqWFQYTRawOeaVzVF8r6kW+oOCjKHI1M+svzmkYvUGJs43OziDz0zYWla5P0jxzcExaBLuzBYmYrzGCd/eCZLxS89RQoxnPCkPYzlUHRoOYpAxpzeWUetcVYDVwKbqspmHbVW0tsSL7eTDvMwT9BT2/SfjRXo9sKOEgRahG0NqlWcpv6oUU7d7MKKpQC3uF+7xd1Y34Nx/3k= aghani@TPT480"
+    inahga1 = "sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIHLtwflRB2PAPOAtqRpH5z7TJ/AG9iKo9pDUo/NdP0KyAAAAEXNzaDp5dWJpa2V5LXNtYWxs"
+    inahga2 = "sk-ecdsa-sha2-nistp256@openssh.com AAAAInNrLWVjZHNhLXNoYTItbmlzdHAyNTZAb3BlbnNzaC5jb20AAAAIbmlzdHAyNTYAAABBBOSSQ4OWadN+OA8FcemI8m+0th+OpOQBnlQPiElzsZvJZ2AN74N6R0av5DyifbkNXI53zMmEJBnvbrJOb/T1bosAAAARc3NoOnl1YmlrZXktc21hbGw="
+    inahga3 = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhnRHibSWdeB4TO9D/K/1O4P7euN57HI+WNs4bIau+y2pT157zi6NteNJrdVLdom1CR7Jn4cPaDydPWKYjbQIU7mlFOIVF+nFs+HeGX2f2+Jub+IAgK9rWmU6OVgQGC29PLCQEr67TeM0Xtn6C2TCx6j58tXkzMJxthr47SY8ucl8/opvoN1xgQUFP9GoXdTamxFUL0xMW4cLdgMLt0fTuLX5jrxKB8+wW9pzdl/Nz7JLS4TXAxsypb6p/hHoegeb5s/CL0SFcjZ6qp1ld6plIVA5pJb00dCLh0hEhe6OhlBC4hWeJxXXXtmpJNJqS2bfkVD6fdOABrXWB5ivaV+Lj"
   }
-}
-
-variable "local_ip_address" {
-  default = "67.184.129.197"
 }
