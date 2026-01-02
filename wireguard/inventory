@@ -1,15 +1,16 @@
 all:
   hosts:
     wireguard:
-      ansible_host: 192.34.59.203
+      ansible_host: 178.128.159.38
       ansible_user: root
     alexandria:
-      ansible_host: 192.168.50.181
+      ansible_host: 192.168.12.100
       ansible_user: inahga
   vars:
-    remote_pub_ip: 192.34.59.203
+    remote_pub_ip: 178.128.159.38
     remote_vpn_ip: 192.168.51.1
     remote_vpn_port: 21841
     local_vpn_ip: 192.168.51.2
     service_port: 6970
     vanilla_port: 25565
+    palworld_port: 8211

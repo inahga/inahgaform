@@ -11,12 +11,12 @@
 - hosts: wireguard:alexandria
   tasks:
     - name: Generate private key for remote server
-      local_action: ansible.builtin.shell /usr/bin/wg genkey
+      local_action: ansible.builtin.shell wg genkey
       run_once: true
       register: rpriv
 
     - name: Generate private key for local server
-      local_action: ansible.builtin.shell /usr/bin/wg genkey
+      local_action: ansible.builtin.shell wg genkey
       run_once: true
       register: lpriv
 
@@ -25,12 +25,12 @@
         lpriv={{ lpriv.stdout }}
 
     - name: Generate public key for remote server
-      local_action: ansible.builtin.shell echo {{ rpriv }} | /usr/bin/wg pubkey
+      local_action: ansible.builtin.shell echo {{ rpriv }} | wg pubkey
       run_once: true
       register: rpub
 
     - name: Generate public key for local server
-      local_action: ansible.builtin.shell echo {{ lpriv }} | /usr/bin/wg pubkey
+      local_action: ansible.builtin.shell echo {{ lpriv }} | wg pubkey
       run_once: true
       register: lpub
 

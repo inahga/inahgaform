@@ -32,6 +32,8 @@
                           iif "eth0" udp dport {{ service_port }} dnat to {{ local_vpn_ip }}
                           iif "eth0" tcp dport {{ vanilla_port }} dnat to {{ local_vpn_ip }}
                           iif "eth0" udp dport {{ vanilla_port }} dnat to {{ local_vpn_ip }}
+                          iif "eth0" tcp dport {{ palworld_port }} dnat to {{ local_vpn_ip }}
+                          iif "eth0" udp dport {{ palworld_port }} dnat to {{ local_vpn_ip }}
                           iif "eth0" udp dport 15777 dnat to {{ local_vpn_ip }}
                           iif "eth0" udp dport 15000 dnat to {{ local_vpn_ip }}
                           iif "eth0" udp dport 7777 dnat to {{ local_vpn_ip }}
@@ -52,6 +54,8 @@
                           iif "eth0" udp dport {{ service_port }} accept
                           iif "eth0" tcp dport {{ vanilla_port }} accept
                           iif "eth0" udp dport {{ vanilla_port }} accept
+                          iif "eth0" tcp dport {{ palworld_port }} accept
+                          iif "eth0" udp dport {{ palworld_port }} accept
                           iif "eth0" udp dport 15777 accept
                           iif "eth0" udp dport 15000 accept
                           iif "eth0" udp dport 7777 accept
